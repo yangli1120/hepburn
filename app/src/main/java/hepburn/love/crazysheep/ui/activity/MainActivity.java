@@ -1,15 +1,12 @@
 package hepburn.love.crazysheep.ui.activity;
 
 import android.app.Activity;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.view.LayoutInflater;
@@ -27,6 +24,8 @@ import hepburn.love.crazysheep.net.NetApi;
 import hepburn.love.crazysheep.ui.adapter.ImageRecyclerAdapter;
 import hepburn.love.crazysheep.ui.fragment.NavigationDrawerFragment;
 import hepburn.love.crazysheep.widget.DividerItemDecoration;
+import hepburn.love.crazysheep.widget.SwipeRefresh.SwipeRefreshBase;
+import hepburn.love.crazysheep.widget.SwipeRefresh.SwipeRefreshRecyclerView;
 
 
 public class MainActivity extends BaseActivity
@@ -129,9 +128,11 @@ public class MainActivity extends BaseActivity
          */
         private static final String ARG_SECTION_NUMBER = "section_number";
 
-        private SwipeRefreshLayout mSwipeRl;
+        private SwipeRefreshRecyclerView mSwipeRv;
         private RecyclerView mImageRv;
         private ImageRecyclerAdapter mImageAdapter;
+
+        private int mStartPage = 0; // the request page of data, start from 0
 
         /**
          * Returns a new instance of this fragment for the given section
@@ -153,36 +154,65 @@ public class MainActivity extends BaseActivity
                                  Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
-            // TODO use recycleview
-            mSwipeRl = (SwipeRefreshLayout) rootView.findViewById(R.id.swipe_rl);
-            mSwipeRl.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            // use recycleview
+            mSwipeRv = (SwipeRefreshRecyclerView) rootView.findViewById(R.id.swipe_rv);
+            mSwipeRv.setOnRefreshListener(new SwipeRefreshBase.OnRefreshListener() {
 
                 @Override
                 public void onRefresh() {
-                    // TODO request first page data
-                    netRequestImages();
+                    // request first page data
+                    netRequestFirstPageImages();
+
+                    LogUtils.iLog(TAG, "onRefresh()");
                 }
             });
-            mSwipeRl.setColorSchemeColors(Color.CYAN);
-            mImageRv = (RecyclerView) rootView.findViewById(R.id.image_rv);
-            mImageRv.setLayoutManager(new StaggeredGridLayoutManager(2, GridLayoutManager.VERTICAL));
+            mSwipeRv.setOnLoadMoreListener(new SwipeRefreshRecyclerView.OnLoadMoreListener() {
+
+                @Override
+                public void onLoadMore() {
+                    // load more request
+                    netRequestNextPageImages();
+
+                    LogUtils.iLog(TAG, "onLoadMore(), data page = " + mStartPage);
+                }
+            });
+            mImageRv = mSwipeRv.getRefreshableView();
+            mImageRv.setLayoutManager(new StaggeredGridLayoutManager(2,
+                    StaggeredGridLayoutManager.VERTICAL));
             mImageRv.addItemDecoration(new DividerItemDecoration(getActivity(),
-                    DividerItemDecoration.VERTICAL_LIST | DividerItemDecoration.HORIZONTAL_LIST));
+                    DividerItemDecoration.VERTICAL_LIST));
             mImageRv.setItemAnimator(new DefaultItemAnimator());
-            mImageRv.setHasFixedSize(false);
+            mImageRv.setHasFixedSize(true);
 
             mImageAdapter = new ImageRecyclerAdapter(getActivity(), null);
             mImageRv.setAdapter(mImageAdapter);
 
-            // TODO start first net request
+            // start first net request
             LogUtils.iLog(TAG, "onCreateView(), start net request to fetch image list");
-            netRequestImages();
+            netRequestFirstPageImages();
 
             return rootView;
         }
 
-        private void netRequestImages() {
-            NetApi.getInstance(getActivity()).getDto(ApiUrls.IMAGE_SOURCES, ImageResultDto.class,
+        private void netRequestFirstPageImages() {
+            mStartPage = 0;
+
+            // clear data
+            mImageAdapter.clearData();
+
+            doNetRequestImages();
+        }
+
+        private void netRequestNextPageImages() {
+            mStartPage++;
+
+            doNetRequestImages();
+        }
+
+        private void doNetRequestImages() {
+            NetApi.getInstance(getActivity()).getDto(
+                    ApiUrls.IMAGE_SOURCES.replace("[%s]", String.valueOf(mStartPage)),
+                    ImageResultDto.class,
                     new NetApi.NetRespListener<ImageResultDto>() {
 
                 @Override
@@ -190,7 +220,7 @@ public class MainActivity extends BaseActivity
                     LogUtils.iLog(TAG, "onSuccess(), fetch data success, list size = "
                             + resultDto.data.size());
 
-                    mImageAdapter.setData(resultDto.data);
+                    mImageAdapter.addData(resultDto.data);
                 }
 
                 @Override
@@ -202,8 +232,8 @@ public class MainActivity extends BaseActivity
 
                 @Override
                 public void onDone() {
-                    // no mater net request success or failed, onDone() will be call at last
-                    mSwipeRl.setRefreshing(false);
+                    // no matter net request success or failed, onDone() will be call at last
+                    mSwipeRv.setRefreshing(false);
                 }
             });
         }

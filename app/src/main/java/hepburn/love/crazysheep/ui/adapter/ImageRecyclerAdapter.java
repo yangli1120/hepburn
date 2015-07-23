@@ -9,6 +9,7 @@ import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import hepburn.love.crazysheep.R;
@@ -35,17 +36,25 @@ public class ImageRecyclerAdapter extends RecyclerView.Adapter<ImageRecyclerAdap
         mInflater = LayoutInflater.from(mContext);
     }
 
-    public void setData(List<ImageResultDto.ImageItemDto> imgUrls) {
-        mImageUrls = imgUrls;
+    public void addData(List<ImageResultDto.ImageItemDto> imgUrls) {
+        if(mImageUrls == null)
+            mImageUrls = new ArrayList<>();
+        mImageUrls.addAll(imgUrls);
 
         notifyDataSetChanged();
     }
 
+    public void clearData() {
+        mImageUrls = null;
+    }
+
     @Override
     public void onBindViewHolder(ImageViewHolder imageViewHolder, int i) {
-        Glide.with(mContext).load(mImageUrls.get(i).image_url).crossFade(100).placeholder(0).into(imageViewHolder.mImageIv);
-
-        LogUtils.iLog(TAG, "onBindViewHolder(), i = " + i + ", load image url = " + mImageUrls.get(i).image_url);
+        imageViewHolder.mImageIv.setImageResource(0);
+        // so fucking pretty api for Glide
+        Glide.with(mContext)
+                .load(mImageUrls.get(i).image_url)
+                .into(imageViewHolder.mImageIv);
     }
 
     @Override
