@@ -1,25 +1,35 @@
-package hepburn.love.crazysheep;
+package hepburn.love.crazysheep.ui.activity;
 
 import android.app.Activity;
-import android.support.v7.app.ActionBarActivity;
-import android.support.v7.app.ActionBar;
+import android.graphics.Color;
+import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.content.Context;
-import android.os.Build;
-import android.os.Bundle;
-import android.view.Gravity;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.ActionBar;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.support.v4.widget.DrawerLayout;
-import android.widget.ArrayAdapter;
-import android.widget.TextView;
+import android.widget.Toast;
+
+import hepburn.love.crazysheep.R;
+import hepburn.love.crazysheep.Utils.LogUtils;
+import hepburn.love.crazysheep.dao.ImageResultDto;
+import hepburn.love.crazysheep.net.ApiUrls;
+import hepburn.love.crazysheep.net.NetApi;
+import hepburn.love.crazysheep.ui.adapter.ImageRecyclerAdapter;
+import hepburn.love.crazysheep.ui.fragment.NavigationDrawerFragment;
+import hepburn.love.crazysheep.widget.DividerItemDecoration;
 
 
-public class MainActivity extends ActionBarActivity
+public class MainActivity extends BaseActivity
         implements NavigationDrawerFragment.NavigationDrawerCallbacks {
 
     /**
@@ -110,11 +120,18 @@ public class MainActivity extends ActionBarActivity
      * A placeholder fragment containing a simple view.
      */
     public static class PlaceholderFragment extends Fragment {
+
+        public static final String TAG = PlaceholderFragment.class.getSimpleName();
+
         /**
          * The fragment argument representing the section number for this
          * fragment.
          */
         private static final String ARG_SECTION_NUMBER = "section_number";
+
+        private SwipeRefreshLayout mSwipeRl;
+        private RecyclerView mImageRv;
+        private ImageRecyclerAdapter mImageAdapter;
 
         /**
          * Returns a new instance of this fragment for the given section
@@ -135,7 +152,60 @@ public class MainActivity extends ActionBarActivity
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.fragment_main, container, false);
+
+            // TODO use recycleview
+            mSwipeRl = (SwipeRefreshLayout) rootView.findViewById(R.id.swipe_rl);
+            mSwipeRl.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+
+                @Override
+                public void onRefresh() {
+                    // TODO request first page data
+                    netRequestImages();
+                }
+            });
+            mSwipeRl.setColorSchemeColors(Color.CYAN);
+            mImageRv = (RecyclerView) rootView.findViewById(R.id.image_rv);
+            mImageRv.setLayoutManager(new StaggeredGridLayoutManager(2, GridLayoutManager.VERTICAL));
+            mImageRv.addItemDecoration(new DividerItemDecoration(getActivity(),
+                    DividerItemDecoration.VERTICAL_LIST | DividerItemDecoration.HORIZONTAL_LIST));
+            mImageRv.setItemAnimator(new DefaultItemAnimator());
+            mImageRv.setHasFixedSize(false);
+
+            mImageAdapter = new ImageRecyclerAdapter(getActivity(), null);
+            mImageRv.setAdapter(mImageAdapter);
+
+            // TODO start first net request
+            LogUtils.iLog(TAG, "onCreateView(), start net request to fetch image list");
+            netRequestImages();
+
             return rootView;
+        }
+
+        private void netRequestImages() {
+            NetApi.getInstance(getActivity()).getDto(ApiUrls.IMAGE_SOURCES, ImageResultDto.class,
+                    new NetApi.NetRespListener<ImageResultDto>() {
+
+                @Override
+                public void onSuccess(ImageResultDto resultDto) {
+                    LogUtils.iLog(TAG, "onSuccess(), fetch data success, list size = "
+                            + resultDto.data.size());
+
+                    mImageAdapter.setData(resultDto.data);
+                }
+
+                @Override
+                public void onError(String message) {
+                    LogUtils.iLog(TAG, "onError(), fetch data failed, error message = " + message);
+
+                    Toast.makeText(getActivity(), message, Toast.LENGTH_SHORT).show();
+                }
+
+                @Override
+                public void onDone() {
+                    // no mater net request success or failed, onDone() will be call at last
+                    mSwipeRl.setRefreshing(false);
+                }
+            });
         }
 
         @Override
