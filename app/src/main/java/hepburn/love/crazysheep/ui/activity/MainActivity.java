@@ -2,7 +2,6 @@ package hepburn.love.crazysheep.ui.activity;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
@@ -22,6 +21,7 @@ import hepburn.love.crazysheep.dao.ImageResultDto;
 import hepburn.love.crazysheep.net.ApiUrls;
 import hepburn.love.crazysheep.net.NetApi;
 import hepburn.love.crazysheep.ui.adapter.ImageRecyclerAdapter;
+import hepburn.love.crazysheep.ui.fragment.BaseFragment;
 import hepburn.love.crazysheep.ui.fragment.NavigationDrawerFragment;
 import hepburn.love.crazysheep.widget.DividerItemDecoration;
 import hepburn.love.crazysheep.widget.SwipeRefresh.SwipeRefreshBase;
@@ -118,7 +118,7 @@ public class MainActivity extends BaseActivity
     /**
      * A placeholder fragment containing a simple view.
      */
-    public static class PlaceholderFragment extends Fragment {
+    public static class PlaceholderFragment extends BaseFragment {
 
         public static final String TAG = PlaceholderFragment.class.getSimpleName();
 
@@ -210,7 +210,7 @@ public class MainActivity extends BaseActivity
         }
 
         private void doNetRequestImages() {
-            NetApi.getInstance(getActivity()).getDto(
+            mNetRequest.getDto(
                     ApiUrls.IMAGE_SOURCES.replace("[%s]", String.valueOf(mStartPage)),
                     ImageResultDto.class,
                     new NetApi.NetRespListener<ImageResultDto>() {

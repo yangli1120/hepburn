@@ -2,6 +2,7 @@ package hepburn.love.crazysheep.net;
 
 import android.content.Context;
 
+import com.android.volley.AuthFailureError;
 import com.android.volley.Network;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -13,7 +14,10 @@ import com.android.volley.toolbox.HurlStack;
 import com.android.volley.toolbox.NoCache;
 import com.android.volley.toolbox.StringRequest;
 
+import java.util.Map;
+
 import hepburn.love.crazysheep.Utils.GsonUtils;
+import hepburn.love.crazysheep.Utils.LogUtils;
 import hepburn.love.crazysheep.dao.BaseDto;
 
 /**
@@ -22,6 +26,8 @@ import hepburn.love.crazysheep.dao.BaseDto;
  * Created by crazysheep on 15/7/23.
  */
 public class NetApi {
+
+    public static final String TAG = NetApi.class.getSimpleName();
 
     /**
      * net request use volley, but image load use glide or fresco
@@ -47,7 +53,7 @@ public class NetApi {
         mContext = context;
     }
 
-    private void startRequestQueue(Context context) {
+    private void startRequestQueue() {
         if(mRequestQueue != null)
             stopRequestQueue();
 
@@ -68,11 +74,15 @@ public class NetApi {
     }
 
     public void start() {
-        startRequestQueue(mContext);
+        startRequestQueue();
     }
 
     public void release() {
         stopRequestQueue();
+    }
+
+    public void cancelAll(String tag) {
+        mRequestQueue.cancelAll(tag);
     }
 
     //////////////////////////////net api such as get or post/////////////////////////
@@ -91,12 +101,16 @@ public class NetApi {
     /**
      * net api for GET method
      *
+     * @param requestTag The request tag for current request
+     * @param method The method such as GET or POST
      * @param url The requset url
+     * @param params The additional params add to request headers
      * @param clazz The java bean for parse json result
      * @param listener The result call back listener
      * */
-    public <T extends BaseDto> void getDto(String url, final Class<T> clazz, final NetRespListener<T> listener) {
-        StringRequest request = new StringRequest(Request.Method.GET, url,
+    public <T extends BaseDto> void request(String requestTag, int method, String url,
+            Map<String, String> params, final Class<T> clazz, final NetRespListener<T> listener) {
+        StringRequest request = new StringRequest(method, url,
                 new Response.Listener<String>() {
 
                     @Override
@@ -113,7 +127,6 @@ public class NetApi {
                     }
                 },
                 new Response.ErrorListener() {
-
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         // handle failed response
@@ -122,6 +135,16 @@ public class NetApi {
                         listener.onDone();
                     }
                 });
+        // if request is POST and params is not NULL, add params to headers
+        if(method == Request.Method.POST && params != null && params.keySet().size() > 0)
+            try {
+                request.getHeaders().putAll(params);
+            } catch (AuthFailureError error) {
+                error.printStackTrace();
+
+                LogUtils.iLog(TAG, "request(), add params to headers failed");
+            }
+        request.setTag(requestTag);
 
         mRequestQueue.add(request);
     }
