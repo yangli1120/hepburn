@@ -1,10 +1,12 @@
 package hepburn.love.crazysheep.ui.adapter;
 
 import android.content.Context;
+import android.os.Build;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
@@ -13,7 +15,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import hepburn.love.crazysheep.R;
-import hepburn.love.crazysheep.Utils.LogUtils;
 import hepburn.love.crazysheep.dao.ImageResultDto;
 
 /**
@@ -49,12 +50,38 @@ public class ImageRecyclerAdapter extends RecyclerView.Adapter<ImageRecyclerAdap
     }
 
     @Override
-    public void onBindViewHolder(ImageViewHolder imageViewHolder, int i) {
-        imageViewHolder.mImageIv.setImageResource(0);
+    public void onBindViewHolder(final ImageViewHolder holder, final int i) {
+        // measure current imageview height by its width
+        // refer to {#https://github.com/drakeet/Meizhi/blob/master/app/src/main/java/me/drakeet/meizhi/MeizhiListAdapter.java}
+        holder.mImageIv.getViewTreeObserver().addOnGlobalLayoutListener(
+                new ViewTreeObserver.OnGlobalLayoutListener() {
+
+                    @Override
+                    public void onGlobalLayout() {
+                        if(mImageUrls != null && i < mImageUrls.size() && mImageUrls.get(i) != null) {
+                            int thumbWidth = mImageUrls.get(i).image_width;
+                            int thumbHeight = mImageUrls.get(i).image_height;
+                            if (thumbWidth > 0 && thumbHeight > 0) {
+                                int width = holder.mImageIv.getMeasuredWidth();
+                                int height = Math.round(width * (float) thumbHeight / thumbWidth);
+                                holder.mImageIv.getLayoutParams().height = height;
+                                holder.mImageIv.setMinimumHeight(height);
+                            }
+                        }
+
+                        // api <= 15
+                        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1)
+                            holder.mImageIv.getViewTreeObserver().removeGlobalOnLayoutListener(this);
+                        else
+                            holder.mImageIv.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                    }
+                });
+
+        holder.mImageIv.setImageResource(0);
         // so fucking pretty api for Glide
         Glide.with(mContext)
                 .load(mImageUrls.get(i).image_url)
-                .into(imageViewHolder.mImageIv);
+                .into(holder.mImageIv);
     }
 
     @Override

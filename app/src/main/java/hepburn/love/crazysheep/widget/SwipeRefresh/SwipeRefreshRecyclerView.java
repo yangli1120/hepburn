@@ -3,6 +3,10 @@ package hepburn.love.crazysheep.widget.SwipeRefresh;
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
+import android.view.LayoutInflater;
+import android.view.View;
+
+import hepburn.love.crazysheep.R;
 
 /**
  * SwipeRefreshBase wrap a RecyclerView, and support load more
@@ -34,12 +38,16 @@ public class SwipeRefreshRecyclerView extends SwipeRefreshBase<RecyclerView> {
 
     @Override
     protected RecyclerView createRefreshableView() {
-        return mRecylerView = new RecyclerView(getContext());
+        // because we CAN NOT show ScrollBar of RecyclerView by programming, this is so stupid...
+        // see {#http://stackoverflow.com/questions/27056379/is-there-any-way-to-enable-scrollbars-for-recyclerview-in-code}
+        View contentView = LayoutInflater.from(getContext()).inflate(
+                R.layout.layout_recyclerview, null);
+        mRecylerView = (RecyclerView)contentView.findViewById(R.id.swipe_recyclerview);
+
+        return mRecylerView;
     }
 
     private void initChild() {
-        RecyclerView.LayoutManager layoutManager = mRecylerView.getLayoutManager();
-
         RecyclerViewOnScrollListener scrollListener = new RecyclerViewOnScrollListener();
         scrollListener.setOnBottomListener(new RecyclerViewOnScrollListener.OnBottomListenr() {
 

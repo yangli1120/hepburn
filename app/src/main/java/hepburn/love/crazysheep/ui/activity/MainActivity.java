@@ -23,7 +23,6 @@ import hepburn.love.crazysheep.net.NetApi;
 import hepburn.love.crazysheep.ui.adapter.ImageRecyclerAdapter;
 import hepburn.love.crazysheep.ui.fragment.BaseFragment;
 import hepburn.love.crazysheep.ui.fragment.NavigationDrawerFragment;
-import hepburn.love.crazysheep.widget.DividerItemDecoration;
 import hepburn.love.crazysheep.widget.SwipeRefresh.SwipeRefreshBase;
 import hepburn.love.crazysheep.widget.SwipeRefresh.SwipeRefreshRecyclerView;
 
@@ -177,10 +176,13 @@ public class MainActivity extends BaseActivity
                 }
             });
             mImageRv = mSwipeRv.getRefreshableView();
+            //GridLayoutManager layoutManager = new GridLayoutManager(getActivity(), 2,
+            //        GridLayoutManager.VERTICAL, false);
+            //layoutManager.setSmoothScrollbarEnabled(true);
             mImageRv.setLayoutManager(new StaggeredGridLayoutManager(2,
                     StaggeredGridLayoutManager.VERTICAL));
-            mImageRv.addItemDecoration(new DividerItemDecoration(getActivity(),
-                    DividerItemDecoration.VERTICAL_LIST));
+            //mImageRv.addItemDecoration(new DividerItemDecoration(getActivity(),
+            //        DividerItemDecoration.VERTICAL_LIST));
             mImageRv.setItemAnimator(new DefaultItemAnimator());
             mImageRv.setHasFixedSize(true);
 
