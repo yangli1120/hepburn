@@ -53,8 +53,7 @@ public class ImageRecyclerAdapter extends RecyclerView.Adapter<ImageRecyclerAdap
 
     @Override
     public void onBindViewHolder(final ImageViewHolder holder, final int i) {
-        holder.mImageIv.setImageResource(0);
-        Glide.clear(holder.mImageIv);
+        final ImageResultDto.ImageItemDto item = mImageUrls.get(i);
 
         // measure current imageview height by its width
         // refer to {#https://github.com/drakeet/Meizhi/blob/master/app/src/main/java/me/drakeet/meizhi/MeizhiListAdapter.java}
@@ -63,20 +62,14 @@ public class ImageRecyclerAdapter extends RecyclerView.Adapter<ImageRecyclerAdap
 
             @Override
             public void onGlobalLayout() {
-                if (mImageUrls != null && i < mImageUrls.size() && mImageUrls.get(i) != null) {
-                    int thumbWidth = mImageUrls.get(i).image_width;
-                    int thumbHeight = mImageUrls.get(i).image_height;
+                if (item != null) {
+                    int thumbWidth = item.image_width;
+                    int thumbHeight = item.image_height;
                     if (thumbWidth > 0 && thumbHeight > 0) {
                         int width = holder.mImageIv.getMeasuredWidth();
                         int height = Math.round(width * (float) thumbHeight / thumbWidth);
                         holder.mImageIv.getLayoutParams().height = height;
                         holder.mImageIv.setMinimumHeight(height);
-
-                        // so fucking pretty api for Glide
-                        Glide.with(mContext)
-                                .load(mImageUrls.get(i).image_url)
-                                .override(width, height)
-                                .into(holder.mImageIv);
                     }
                 }
 
@@ -95,10 +88,16 @@ public class ImageRecyclerAdapter extends RecyclerView.Adapter<ImageRecyclerAdap
                 Toast.makeText(mContext, "click item pos: " + i, Toast.LENGTH_SHORT).show();
 
                 // check the original image
-                if(mImageUrls != null && i < mImageUrls.size() && mImageUrls.get(i) != null)
+                if (mImageUrls != null && i < mImageUrls.size() && mImageUrls.get(i) != null)
                     PhotoViewActivity.start(mContext, mImageUrls.get(i).image_url);
             }
         });
+
+        // so fucking pretty api for Glide
+        Glide.with(mContext)
+                .load(mImageUrls.get(i).image_url)
+                .into(holder.mImageIv);
+
     }
 
     @Override
