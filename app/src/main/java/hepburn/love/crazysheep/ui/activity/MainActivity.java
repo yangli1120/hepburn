@@ -1,15 +1,13 @@
 package hepburn.love.crazysheep.ui.activity;
 
-import android.app.Activity;
 import android.os.Bundle;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBar;
+import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
+import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,81 +20,25 @@ import hepburn.love.crazysheep.net.ApiUrls;
 import hepburn.love.crazysheep.net.NetApi;
 import hepburn.love.crazysheep.ui.adapter.ImageRecyclerAdapter;
 import hepburn.love.crazysheep.ui.fragment.BaseFragment;
-import hepburn.love.crazysheep.ui.fragment.NavigationDrawerFragment;
 import hepburn.love.crazysheep.widget.SwipeRefresh.SwipeRefreshBase;
 import hepburn.love.crazysheep.widget.SwipeRefresh.SwipeRefreshRecyclerView;
 
-
-public class MainActivity extends BaseActivity
-        implements NavigationDrawerFragment.NavigationDrawerCallbacks {
-
-    /**
-     * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
-     */
-    private NavigationDrawerFragment mNavigationDrawerFragment;
-
-    /**
-     * Used to store the last screen title. For use in {@link #restoreActionBar()}.
-     */
-    private CharSequence mTitle;
+/**
+ * main activity for this app
+ *
+ * @author crazysheep
+ * */
+public class MainActivity extends BaseActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mNavigationDrawerFragment = (NavigationDrawerFragment)
-                getSupportFragmentManager().findFragmentById(R.id.navigation_drawer);
-        mTitle = getTitle();
-
-        // Set up the drawer.
-        mNavigationDrawerFragment.setUp(
-                R.id.navigation_drawer,
-                (DrawerLayout) findViewById(R.id.drawer_layout));
-    }
-
-    @Override
-    public void onNavigationDrawerItemSelected(int position) {
-        // update the main content by replacing fragments
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        fragmentManager.beginTransaction()
-                .replace(R.id.container, PlaceholderFragment.newInstance(position + 1))
-                .commit();
-    }
-
-    public void onSectionAttached(int number) {
-        switch (number) {
-            case 1:
-                mTitle = getString(R.string.title_section1);
-                break;
-            case 2:
-                mTitle = getString(R.string.title_section2);
-                break;
-            case 3:
-                mTitle = getString(R.string.title_section3);
-                break;
-        }
-    }
-
-    public void restoreActionBar() {
-        ActionBar actionBar = getSupportActionBar();
-        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
-        actionBar.setDisplayShowTitleEnabled(true);
-        actionBar.setTitle(mTitle);
-    }
-
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        if (!mNavigationDrawerFragment.isDrawerOpen()) {
-            // Only show items in the action bar relevant to this screen
-            // if the drawer is not showing. Otherwise, let the drawer
-            // decide what to show in the action bar.
-            getMenuInflater().inflate(R.menu.main, menu);
-            restoreActionBar();
-            return true;
-        }
-        return super.onCreateOptionsMenu(menu);
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.container, PlaceholderFragment.newInstance(0), "container")
+                .commitAllowingStateLoss();
     }
 
     @Override
@@ -127,6 +69,9 @@ public class MainActivity extends BaseActivity
          */
         private static final String ARG_SECTION_NUMBER = "section_number";
 
+        private Toolbar mMainTb;
+        private CollapsingToolbarLayout mMainCollapsingTbl;
+
         private SwipeRefreshRecyclerView mSwipeRv;
         private RecyclerView mImageRv;
         private ImageRecyclerAdapter mImageAdapter;
@@ -152,6 +97,12 @@ public class MainActivity extends BaseActivity
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.fragment_main, container, false);
+
+            // init toolbar
+            mMainTb = (Toolbar) rootView.findViewById(R.id.main_tb);
+            ((AppCompatActivity) getActivity()).setSupportActionBar(mMainTb);
+            mMainCollapsingTbl = (CollapsingToolbarLayout) rootView.findViewById(R.id.main_collapsing_tbl);
+            mMainCollapsingTbl.setTitle("she is lovely");
 
             // use recycleview
             mSwipeRv = (SwipeRefreshRecyclerView) rootView.findViewById(R.id.swipe_rv);
@@ -238,13 +189,6 @@ public class MainActivity extends BaseActivity
                     mSwipeRv.setRefreshing(false);
                 }
             });
-        }
-
-        @Override
-        public void onAttach(Activity activity) {
-            super.onAttach(activity);
-            ((MainActivity) activity).onSectionAttached(
-                    getArguments().getInt(ARG_SECTION_NUMBER));
         }
     }
 
