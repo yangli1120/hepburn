@@ -21,3 +21,6 @@
 
 ##### -- 20150723 --
 初步构建了网络层，实现了一个SwipeRefreshRecyclerView，并加入了load more的监听器，对RecyclerView使用还是比较生疏，没有达到理想的瀑布流效果。
+
+##### -- 20150806 --
+想用CollapsingToolbarLayout实现动态展开的toolbar，发现CollapsingToolbarLayout本身只支持RecyclerView和NestedScrollView...
