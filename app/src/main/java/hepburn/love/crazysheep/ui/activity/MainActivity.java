@@ -1,6 +1,7 @@
 package hepburn.love.crazysheep.ui.activity;
 
 import android.os.Bundle;
+import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.RecyclerView;
@@ -23,12 +24,13 @@ import hepburn.love.crazysheep.widget.SwipeRefresh.SwipeRefreshRecyclerView;
  *
  * @author crazysheep
  * */
-public class MainActivity extends BaseActivity {
+public class MainActivity extends BaseActivity implements AppBarLayout.OnOffsetChangedListener {
 
     private String TAG = MainActivity.class.getSimpleName();
 
-    protected Toolbar mMainTb;
-    protected CollapsingToolbarLayout mMainCollapsingTbl;
+    private Toolbar mMainTb;
+    private CollapsingToolbarLayout mMainCollapsingTbl;
+    private AppBarLayout mMainAbl;
 
     private SwipeRefreshRecyclerView mSwipeRv;
     private RecyclerView mImageRv;
@@ -43,15 +45,17 @@ public class MainActivity extends BaseActivity {
         setContentView(R.layout.activity_main);
 
         // init self toolbar
-        mMainTb = (Toolbar) findViewById(R.id.main_tb);
+        mMainTb = findView(R.id.main_tb);
         setSupportActionBar(mMainTb);
+        getSupportActionBar().setHomeButtonEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
-        mMainCollapsingTbl = (CollapsingToolbarLayout) findViewById(R.id.main_collapsing_tbl);
+        mMainCollapsingTbl = findView(R.id.main_collapsing_tbl);
         mMainCollapsingTbl.setTitle("she is lovely");
+        mMainAbl = findView(R.id.main_abl);
 
         // use recycleview
-        mSwipeRv = (SwipeRefreshRecyclerView) findViewById(R.id.swipe_rv);
+        mSwipeRv = findView(R.id.swipe_rv);
         mSwipeRv.setOnRefreshListener(new SwipeRefreshBase.OnRefreshListener() {
 
             @Override
@@ -92,6 +96,20 @@ public class MainActivity extends BaseActivity {
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+
+        mMainAbl.addOnOffsetChangedListener(this);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        mMainAbl.removeOnOffsetChangedListener(this);
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
@@ -106,6 +124,13 @@ public class MainActivity extends BaseActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onOffsetChanged(AppBarLayout appBarLayout, int i) {
+        // fixed conflict between SwipeRefreshLayout and CollapsingToolbarLayout
+        // see{#http://stackoverflow.com/questions/30779667/android-collapsingtoolbarlayout-and-swiperefreshlayout}
+        mSwipeRv.getSwipeRefreshLayout().setEnabled(i == 0);
     }
 
     private void netRequestFirstPageImages() {

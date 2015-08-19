@@ -68,6 +68,10 @@ public abstract class SwipeRefreshBase<T extends View> extends FrameLayout {
         return mRefreshableView;
     }
 
+    public SwipeRefreshLayout getSwipeRefreshLayout() {
+        return mSwipeParent;
+    }
+
     protected abstract T createRefreshableView();
 
     /////////////////////////listener////////////////////////////////

@@ -6,6 +6,7 @@ import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.LinearLayout;
 
 import hepburn.love.crazysheep.R;
@@ -47,6 +48,7 @@ public class BaseActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
         super.setContentView(R.layout.activity_base);
         if(mToolbarType == TOOLBAR_TYPE_NO)
             findView(R.id.main_tb).setVisibility(View.GONE);
