@@ -24,3 +24,6 @@
 
 ##### -- 20150806 --
 想用CollapsingToolbarLayout实现动态展开的toolbar，发现CollapsingToolbarLayout本身只支持RecyclerView和NestedScrollView...
+
+##### -- 20150819 --
+使用supprot.v7.Toolbar替代actionbar，并且默认BaseActivity里面初始化一个toolbar，子类无需再额外初始化，但是要用到CollapsingToolbarLayout的话，因为要CoordinatorLayout作为父布局，所以子类还是要在和CollapsingToolbarLayout同层级自己初始化一个toolbar
