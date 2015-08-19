@@ -27,8 +27,8 @@ public class MainActivity extends BaseActivity {
 
     private String TAG = MainActivity.class.getSimpleName();
 
-    private Toolbar mMainTb;
-    private CollapsingToolbarLayout mMainCollapsingTbl;
+    protected Toolbar mMainTb;
+    protected CollapsingToolbarLayout mMainCollapsingTbl;
 
     private SwipeRefreshRecyclerView mSwipeRv;
     private RecyclerView mImageRv;
@@ -38,10 +38,11 @@ public class MainActivity extends BaseActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        setToolbarType(TOOLBAR_TYPE_NO);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // init toolbar
+        // init self toolbar
         mMainTb = (Toolbar) findViewById(R.id.main_tb);
         setSupportActionBar(mMainTb);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);

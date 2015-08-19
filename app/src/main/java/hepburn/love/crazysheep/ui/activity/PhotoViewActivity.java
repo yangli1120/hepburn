@@ -3,6 +3,8 @@ package hepburn.love.crazysheep.ui.activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
+import android.view.MenuItem;
 
 import com.bumptech.glide.Glide;
 
@@ -36,11 +38,29 @@ public class PhotoViewActivity extends BaseActivity {
         setContentView(R.layout.activity_phone_view);
 
         parseIntent();
+        initToolbar();
         initUI();
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home: {
+                finish();
+
+                return true;
+            }
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
     private void parseIntent() {
         mImageUrl = getIntent().getStringExtra("image_url");
+    }
+
+    private void initToolbar() {
+        mFatherTb.setTitle("photo");
     }
 
     private void initUI() {
