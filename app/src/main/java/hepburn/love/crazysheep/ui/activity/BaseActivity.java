@@ -1,6 +1,8 @@
 package hepburn.love.crazysheep.ui.activity;
 
 import android.app.Activity;
+import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -11,6 +13,7 @@ import android.widget.LinearLayout;
 
 import hepburn.love.crazysheep.R;
 import hepburn.love.crazysheep.Utils.StringUtils;
+import hepburn.love.crazysheep.Utils.ViewUtils;
 import hepburn.love.crazysheep.net.NetRequest;
 
 /**
@@ -34,7 +37,7 @@ public class BaseActivity extends AppCompatActivity {
      * good function for to replace The findViewById()
      * */
     protected final <T extends View> T findView(int viewId) {
-        return (T) findViewById(viewId);
+        return (T) ViewUtils.findView(this, viewId);
     }
 
     protected final Activity getActivity() {
@@ -49,6 +52,8 @@ public class BaseActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+        getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
         super.setContentView(R.layout.activity_base);
         if(mToolbarType == TOOLBAR_TYPE_NO)
             findView(R.id.main_tb).setVisibility(View.GONE);

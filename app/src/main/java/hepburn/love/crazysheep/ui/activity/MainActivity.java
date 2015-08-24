@@ -45,16 +45,17 @@ public class MainActivity extends BaseActivity implements AppBarLayout.OnOffsetC
         setContentView(R.layout.activity_main);
 
         // init self toolbar
-        mMainTb = findView(R.id.main_tb);
-        setSupportActionBar(mMainTb);
-        getSupportActionBar().setHomeButtonEnabled(true);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setDisplayShowHomeEnabled(true);
-        mMainCollapsingTbl = findView(R.id.main_collapsing_tbl);
-        mMainCollapsingTbl.setTitle("she is lovely");
-        mMainAbl = findView(R.id.main_abl);
+        initToolbar();
 
         // use recycleview
+        initUI();
+
+        // start first net request
+        LogUtils.iLog(TAG, "onCreateView(), start net request to fetch image list");
+        netRequestFirstPageImages();
+    }
+
+    private void initUI() {
         mSwipeRv = findView(R.id.swipe_rv);
         mSwipeRv.setOnRefreshListener(new SwipeRefreshBase.OnRefreshListener() {
 
@@ -89,10 +90,17 @@ public class MainActivity extends BaseActivity implements AppBarLayout.OnOffsetC
 
         mImageAdapter = new ImageRecyclerAdapter(getActivity(), null);
         mImageRv.setAdapter(mImageAdapter);
+    }
 
-        // start first net request
-        LogUtils.iLog(TAG, "onCreateView(), start net request to fetch image list");
-        netRequestFirstPageImages();
+    private void initToolbar() {
+        mMainTb = findView(R.id.main_tb);
+        setSupportActionBar(mMainTb);
+        getSupportActionBar().setHomeButtonEnabled(true);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        mMainCollapsingTbl = findView(R.id.main_collapsing_tbl);
+        mMainCollapsingTbl.setTitle("she is lovely");
+        mMainAbl = findView(R.id.main_abl);
     }
 
     @Override

@@ -4,7 +4,9 @@
     android:id="@+id/activity_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:fitsSystemWindows="true"
+    android:clipToPadding="false">
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/main_tb"
@@ -14,6 +16,6 @@
         app:layout_collapseMode="pin"
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-        android:fitsSystemWindows="false"/>
+        android:fitsSystemWindows="true"/>
 
 </LinearLayout>

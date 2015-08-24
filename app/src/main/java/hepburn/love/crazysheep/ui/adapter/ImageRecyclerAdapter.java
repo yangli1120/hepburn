@@ -30,6 +30,7 @@ public class ImageRecyclerAdapter extends RecyclerView.Adapter<ImageRecyclerAdap
 
     private Context mContext;
     private List<ImageResultDto.ImageItemDto> mImageUrls;
+    private List<String> mImageUrlsStr;
     private LayoutInflater mInflater;
 
     public ImageRecyclerAdapter(Context context, List<ImageResultDto.ImageItemDto> imgUrls) {
@@ -43,6 +44,10 @@ public class ImageRecyclerAdapter extends RecyclerView.Adapter<ImageRecyclerAdap
         if(mImageUrls == null)
             mImageUrls = new ArrayList<>();
         mImageUrls.addAll(imgUrls);
+
+        mImageUrlsStr = new ArrayList<>(mImageUrls.size());
+        for(ImageResultDto.ImageItemDto item : mImageUrls)
+            mImageUrlsStr.add(item.image_url);
 
         notifyDataSetChanged();
     }
@@ -89,7 +94,7 @@ public class ImageRecyclerAdapter extends RecyclerView.Adapter<ImageRecyclerAdap
 
                 // check the original image
                 if (mImageUrls != null && i < mImageUrls.size() && mImageUrls.get(i) != null)
-                    PhotoViewActivity.start(mContext, mImageUrls.get(i).image_url);
+                    PhotoViewActivity.start(mContext, mImageUrlsStr, i);
             }
         });
 
