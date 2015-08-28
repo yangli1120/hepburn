@@ -15,6 +15,8 @@ import com.bumptech.glide.Glide;
 import java.util.ArrayList;
 import java.util.List;
 
+import butterknife.Bind;
+import butterknife.ButterKnife;
 import hepburn.love.crazysheep.R;
 import hepburn.love.crazysheep.dao.ImageResultDto;
 import hepburn.love.crazysheep.ui.activity.PhotoViewActivity;
@@ -120,12 +122,11 @@ public class ImageRecyclerAdapter extends RecyclerView.Adapter<ImageRecyclerAdap
     //////////////////////////////////////////////////////////////////////////
     public static class ImageViewHolder extends RecyclerView.ViewHolder {
 
-        private ImageView mImageIv;
+        protected @Bind(R.id.image_iv) ImageView mImageIv;
 
         public ImageViewHolder(View parent) {
             super(parent);
-
-            mImageIv = (ImageView) parent.findViewById(R.id.image_iv);
+            ButterKnife.bind(this, parent);
         }
     }
 }

@@ -10,6 +10,8 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import butterknife.Bind;
+import butterknife.ButterKnife;
 import hepburn.love.crazysheep.R;
 import hepburn.love.crazysheep.Utils.LogUtils;
 import hepburn.love.crazysheep.dao.ImageResultDto;
@@ -28,11 +30,11 @@ public class MainActivity extends BaseActivity implements AppBarLayout.OnOffsetC
 
     private String TAG = MainActivity.class.getSimpleName();
 
-    private Toolbar mMainTb;
-    private CollapsingToolbarLayout mMainCollapsingTbl;
-    private AppBarLayout mMainAbl;
+    protected @Bind(R.id.main_tb) Toolbar mMainTb;
+    protected @Bind(R.id.main_collapsing_tbl) CollapsingToolbarLayout mMainCollapsingTbl;
+    protected @Bind(R.id.main_abl) AppBarLayout mMainAbl;
 
-    private SwipeRefreshRecyclerView mSwipeRv;
+    protected @Bind(R.id.swipe_rv) SwipeRefreshRecyclerView mSwipeRv;
     private RecyclerView mImageRv;
     private ImageRecyclerAdapter mImageAdapter;
 
@@ -43,6 +45,8 @@ public class MainActivity extends BaseActivity implements AppBarLayout.OnOffsetC
         setToolbarType(TOOLBAR_TYPE_NO);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        ButterKnife.bind(this);
 
         // init self toolbar
         initToolbar();
@@ -56,7 +60,6 @@ public class MainActivity extends BaseActivity implements AppBarLayout.OnOffsetC
     }
 
     private void initUI() {
-        mSwipeRv = findView(R.id.swipe_rv);
         mSwipeRv.setOnRefreshListener(new SwipeRefreshBase.OnRefreshListener() {
 
             @Override
@@ -93,14 +96,12 @@ public class MainActivity extends BaseActivity implements AppBarLayout.OnOffsetC
     }
 
     private void initToolbar() {
-        mMainTb = findView(R.id.main_tb);
         setSupportActionBar(mMainTb);
         getSupportActionBar().setHomeButtonEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
-        mMainCollapsingTbl = findView(R.id.main_collapsing_tbl);
+
         mMainCollapsingTbl.setTitle("she is lovely");
-        mMainAbl = findView(R.id.main_abl);
     }
 
     @Override
@@ -115,6 +116,13 @@ public class MainActivity extends BaseActivity implements AppBarLayout.OnOffsetC
         super.onPause();
 
         mMainAbl.removeOnOffsetChangedListener(this);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        ButterKnife.unbind(this);
     }
 
     @Override

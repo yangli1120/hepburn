@@ -3,15 +3,16 @@ package hepburn.love.crazysheep.ui.activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.support.v4.view.ViewPager;
 import android.view.MenuItem;
 import android.view.View;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
 
+import butterknife.Bind;
+import butterknife.BindString;
+import butterknife.ButterKnife;
 import hepburn.love.crazysheep.R;
 import hepburn.love.crazysheep.ui.adapter.ImagesPagerAdapter;
 
@@ -34,7 +35,7 @@ public class PhotoViewActivity extends BaseActivity implements View.OnClickListe
 
     ////////////////////////////////////////////////////////////////////////
 
-    private ViewPager mImageVp;
+    protected @Bind(R.id.image_vp) ViewPager mImageVp;
     private ImagesPagerAdapter mPagerAdapter;
 
     private List<String> mImageUrls;
@@ -44,10 +45,18 @@ public class PhotoViewActivity extends BaseActivity implements View.OnClickListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_phone_view);
+        ButterKnife.bind(this);
 
         parseIntent();
         initToolbar();
         initUI();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        ButterKnife.unbind(this);
     }
 
     @Override
@@ -85,7 +94,6 @@ public class PhotoViewActivity extends BaseActivity implements View.OnClickListe
     }
 
     private void initUI() {
-        mImageVp = findView(R.id.image_vp);
         mImageVp.setOnClickListener(this);
 
         mPagerAdapter = new ImagesPagerAdapter(this, mImageUrls);

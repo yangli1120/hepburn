@@ -36,7 +36,7 @@ public class BaseActivity extends AppCompatActivity {
     /**
      * good function for to replace The findViewById()
      * */
-    protected final <T extends View> T findView(int viewId) {
+    private final <T extends View> T findView(int viewId) {
         return (T) ViewUtils.findView(this, viewId);
     }
 
