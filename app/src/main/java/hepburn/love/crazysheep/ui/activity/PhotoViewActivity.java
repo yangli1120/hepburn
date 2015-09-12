@@ -1,7 +1,11 @@
 package hepburn.love.crazysheep.ui.activity;
 
+import android.annotation.TargetApi;
+import android.app.Activity;
+import android.app.ActivityOptions;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
 import android.view.MenuItem;
@@ -11,7 +15,6 @@ import java.io.Serializable;
 import java.util.List;
 
 import butterknife.Bind;
-import butterknife.BindString;
 import butterknife.ButterKnife;
 import hepburn.love.crazysheep.R;
 import hepburn.love.crazysheep.ui.adapter.ImagesPagerAdapter;
@@ -31,6 +34,20 @@ public class PhotoViewActivity extends BaseActivity implements View.OnClickListe
         i.putExtra("item_position", clickPosition);
 
         context.startActivity(i);
+    }
+
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    public static void startWithTransition(Activity activity, List<String> imageUrls,
+        int clickPosition, View sharedView) {
+        Intent i = new Intent(activity, PhotoViewActivity.class);
+        i.putExtra("image_urls", (Serializable) imageUrls);
+        i.putExtra("item_position", clickPosition);
+
+        sharedView.setTransitionName(activity.getString(R.string.transition_click_image));
+
+        ActivityOptions activityOptions = ActivityOptions.makeSceneTransitionAnimation(activity,
+                sharedView, activity.getString(R.string.transition_click_image));
+        activity.startActivity(i, activityOptions.toBundle());
     }
 
     ////////////////////////////////////////////////////////////////////////
@@ -94,6 +111,9 @@ public class PhotoViewActivity extends BaseActivity implements View.OnClickListe
     }
 
     private void initUI() {
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            mImageVp.setTransitionName(getString(R.string.transition_click_image));
+        }
         mImageVp.setOnClickListener(this);
 
         mPagerAdapter = new ImagesPagerAdapter(this, mImageUrls);

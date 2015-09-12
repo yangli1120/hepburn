@@ -20,7 +20,8 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".ui.activity.PhotoViewActivity" />
+        <activity android:name=".ui.activity.PhotoViewActivity"
+            android:theme="@style/TranslateTheme"/>
     </application>
 
 </manifest>

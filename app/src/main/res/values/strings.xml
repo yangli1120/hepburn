@@ -11,4 +11,7 @@
     <string name="action_example">Example action</string>
 
     <string name="action_settings">Settings</string>
+
+    <!-- for Transition animations -->
+    <string name="transition_click_image">transition_click_image</string>
 </resources>

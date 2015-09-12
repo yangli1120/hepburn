@@ -1,5 +1,6 @@
 package hepburn.love.crazysheep.ui.adapter;
 
+import android.app.Activity;
 import android.content.Context;
 import android.os.Build;
 import android.support.v7.widget.RecyclerView;
@@ -95,8 +96,12 @@ public class ImageRecyclerAdapter extends RecyclerView.Adapter<ImageRecyclerAdap
                 Toast.makeText(mContext, "click item pos: " + i, Toast.LENGTH_SHORT).show();
 
                 // check the original image
-                if (mImageUrls != null && i < mImageUrls.size() && mImageUrls.get(i) != null)
-                    PhotoViewActivity.start(mContext, mImageUrlsStr, i);
+                if (mImageUrls != null && i < mImageUrls.size() && mImageUrls.get(i) != null) {
+                    if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+                        PhotoViewActivity.startWithTransition((Activity)mContext, mImageUrlsStr, i, holder.mImageIv);
+                    else
+                        PhotoViewActivity.start(mContext, mImageUrlsStr, i);
+                }
             }
         });
 
