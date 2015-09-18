@@ -1,6 +1,7 @@
 package hepburn.love.crazysheep.ui.activity;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -8,11 +9,19 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
+
+import java.io.Serializable;
+import java.util.ArrayList;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import de.greenrobot.event.EventBus;
+import de.greenrobot.event.Subscribe;
 import hepburn.love.crazysheep.R;
+import hepburn.love.crazysheep.Utils.ActivityUtils;
+import hepburn.love.crazysheep.Utils.ImageUtils;
 import hepburn.love.crazysheep.Utils.LogUtils;
 import hepburn.love.crazysheep.dao.ImageResultDto;
 import hepburn.love.crazysheep.net.ApiUrls;
@@ -47,6 +56,7 @@ public class MainActivity extends BaseActivity implements AppBarLayout.OnOffsetC
         setContentView(R.layout.activity_main);
 
         ButterKnife.bind(this);
+        EventBus.getDefault().register(this);
 
         // init self toolbar
         initToolbar();
@@ -104,6 +114,27 @@ public class MainActivity extends BaseActivity implements AppBarLayout.OnOffsetC
         mMainCollapsingTbl.setTitle("she is lovely");
     }
 
+    @Subscribe
+    public void onEventMainThread(@NonNull ItemClickEvent event) {
+        String imageFilePath = ImageUtils.compressBitmapToPath(
+                ImageUtils.getScreenShotFromView(event.clickView));
+
+        int[] locations = new int[2];
+        event.clickView.getLocationOnScreen(locations);
+
+        ActivityUtils.start(this,
+                ActivityUtils.prepareIntent(this, PhotoViewActivity.class)
+                        .putExtra("image_path", imageFilePath)
+                        .putExtra("location_x", locations[0])
+                        .putExtra("location_y", locations[1])
+                        .putExtra("view_width", event.clickView.getWidth())
+                        .putExtra("view_height", event.clickView.getHeight())
+                        .putExtra("image_urls", (Serializable) mImageAdapter.getData())
+                        .putExtra("item_position", event.position));
+
+        overridePendingTransition(0, 0); // clear activity transition
+    }
+
     @Override
     protected void onResume() {
         super.onResume();
@@ -123,6 +154,7 @@ public class MainActivity extends BaseActivity implements AppBarLayout.OnOffsetC
         super.onDestroy();
 
         ButterKnife.unbind(this);
+        EventBus.getDefault().unregister(this);
     }
 
     @Override
@@ -191,6 +223,18 @@ public class MainActivity extends BaseActivity implements AppBarLayout.OnOffsetC
                 mSwipeRv.setRefreshing(false);
             }
         });
+    }
+
+    ///////////////////////////// event /////////////////////////////
+
+    public static class ItemClickEvent {
+        public int position;
+        public View clickView;
+
+        public ItemClickEvent(int position, View clickView) {
+            this.position = position;
+            this.clickView = clickView;
+        }
     }
 
 }

@@ -18,8 +18,10 @@ import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import de.greenrobot.event.EventBus;
 import hepburn.love.crazysheep.R;
 import hepburn.love.crazysheep.dao.ImageResultDto;
+import hepburn.love.crazysheep.ui.activity.MainActivity;
 import hepburn.love.crazysheep.ui.activity.PhotoViewActivity;
 
 /**
@@ -55,13 +57,17 @@ public class ImageRecyclerAdapter extends RecyclerView.Adapter<ImageRecyclerAdap
         notifyDataSetChanged();
     }
 
+    public List<String> getData() {
+        return mImageUrlsStr;
+    }
+
     public void clearData() {
         mImageUrls = null;
     }
 
     @Override
-    public void onBindViewHolder(final ImageViewHolder holder, final int i) {
-        final ImageResultDto.ImageItemDto item = mImageUrls.get(i);
+    public void onBindViewHolder(final ImageViewHolder holder, final int position) {
+        final ImageResultDto.ImageItemDto item = mImageUrls.get(position);
 
         // measure current imageview height by its width
         // refer to {#https://github.com/drakeet/Meizhi/blob/master/app/src/main/java/me/drakeet/meizhi/MeizhiListAdapter.java}
@@ -93,21 +99,22 @@ public class ImageRecyclerAdapter extends RecyclerView.Adapter<ImageRecyclerAdap
 
             @Override
             public void onClick(View v) {
-                Toast.makeText(mContext, "click item pos: " + i, Toast.LENGTH_SHORT).show();
+                Toast.makeText(mContext, "click item pos: " + position, Toast.LENGTH_SHORT).show();
 
-                // check the original image
+                /*// check the original image
                 if (mImageUrls != null && i < mImageUrls.size() && mImageUrls.get(i) != null) {
                     if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
                         PhotoViewActivity.startWithTransition((Activity)mContext, mImageUrlsStr, i, holder.mImageIv);
                     else
                         PhotoViewActivity.start(mContext, mImageUrlsStr, i);
-                }
+                }*/
+                EventBus.getDefault().post(new MainActivity.ItemClickEvent(position, holder.mImageIv));
             }
         });
 
         // so fucking pretty api for Glide
         Glide.with(mContext)
-                .load(mImageUrls.get(i).image_url)
+                .load(mImageUrls.get(position).image_url)
                 .into(holder.mImageIv);
 
     }

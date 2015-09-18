@@ -14,14 +14,21 @@ public class ActivityUtils {
     /**
      * start activity for activity
      * */
-    public static void start(Context context, Class<Activity> clazz) {
+    public static void start(Context context, Class<? extends Activity> clazz) {
         context.startActivity(new Intent(context, clazz));
+    }
+
+    /**
+     * start activity with target intent
+     * */
+    public static void start(Context context, Intent intent) {
+        context.startActivity(intent);
     }
 
     /**
      * create a target intent
      * */
-    public static Intent prepareIntent(Context context, Class<Activity> clazz) {
+    public static Intent prepareIntent(Context context, Class<? extends Activity> clazz) {
         return new Intent(context, clazz);
     }
 
