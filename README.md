@@ -27,3 +27,6 @@
 
 ##### -- 20150819 --
 使用supprot.v7.Toolbar替代actionbar，并且默认BaseActivity里面初始化一个toolbar，子类无需再额外初始化，但是要用到CollapsingToolbarLayout的话，因为要CoordinatorLayout作为父布局，所以子类还是要在和CollapsingToolbarLayout同层级自己初始化一个toolbar
+
+##### -- 20150919 --
+本地图库(QuickPic)适合点击图片放大到全屏。但是在线图库不适合这个动画。在线图库，因为网络的不确定性，图片的加载也存在极大不确定性，所以无法保证缩略图放大的动画完成的时候，图片已经加载完成，一旦网络延迟，就会导致动画的不连贯，这大概也是微信放弃[聊天中点缩略图查看大图的场景]中使用scale动画的原因。
